@@ -16,5 +16,10 @@
       "matches": ["https://github.com/*"],
       "exclude_matches": ["https://*/login/*"]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{51c088ab-6ad6-455e-8988-8c7801ea2487}"
+    }
+  }
 }
