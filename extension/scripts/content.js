@@ -51,6 +51,8 @@ function injectAddToLinearLink() {
   linkEl.style.display = 'flex';
   linkEl.style.gap = '0.2em';
   linkEl.style.alignItems = 'center';
+  linkEl.style.alignSelf = 'flex-start';
+  linkEl.style.marginInlineStart = 'auto';
   linkEl.classList.add('btn', 'btn-sm');
   // Inject the link into the page.
   headerMeta.appendChild(linkEl);
