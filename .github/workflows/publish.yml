@@ -11,8 +11,6 @@ on:
 jobs:
   submit:
     name: Submit
-    # Filter out tags pushed to branches other than latest
-    if: github.ref == 'refs/head/latest'
     strategy:
       fail-fast: false
       matrix:
