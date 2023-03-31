@@ -5,10 +5,11 @@
     { "repo": "delucis/github-to-linear" }
   ],
   "commit": false,
-  "fixed": [],
-  "linked": [],
   "access": "restricted",
   "baseBranch": "latest",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "privatePackages": {
+    "version": true,
+    "tag": true
+  }
 }
