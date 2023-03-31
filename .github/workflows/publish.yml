@@ -1,0 +1,48 @@
+name: Publish
+
+env:
+  WEB_EXT_SOURCE_DIR: dist
+
+on:
+  push:
+    branches:
+      - latest
+    tags:
+      - v**
+
+jobs:
+  submit:
+    name: Submit
+    strategy:
+      fail-fast: false
+      matrix:
+        command:
+          - Firefox
+          - Chrome
+    environment: ${{ matrix.command }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Install Dependencies
+        run: pnpm i
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Submit to Mozilla
+        if: matrix.command == 'Firefox'
+        run: npx web-ext-submit@7
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+
