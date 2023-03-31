@@ -49,7 +49,7 @@ function injectAddToLinearLink() {
   <span>Add to Linear</span>`;
   // Add some minimal styles.
   linkEl.style.display = 'flex';
-  linkEl.style.gap = '0.2em';
+  linkEl.style.gap = '0.25rem';
   linkEl.style.alignItems = 'center';
   linkEl.style.alignSelf = 'flex-start';
   linkEl.style.marginInlineStart = 'auto';
