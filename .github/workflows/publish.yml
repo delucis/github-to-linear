@@ -5,14 +5,14 @@ env:
 
 on:
   push:
-    branches:
-      - latest
     tags:
-      - v**
+      - 'v[0-9].[0-9]+.[0-9]+'
 
 jobs:
   submit:
     name: Submit
+    # Filter out tags pushed to branches other than latest
+    if: github.ref == 'refs/head/latest'
     strategy:
       fail-fast: false
       matrix:
