@@ -5,6 +5,9 @@
   "description": "Quickly create a Linear ticket from any GitHub PR or issue.",
   "author": "delucis",
   "license": "GPL-3.0",
+  "scripts": {
+    "build": "node ./scripts/build.mjs"
+  },
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.1"

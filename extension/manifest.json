@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GitHub to Linear",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Quickly create a Linear ticket from any GitHub PR or issue.",
   "author": "swithinbank@gmail.com",
   "icons": {
