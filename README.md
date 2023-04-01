@@ -10,6 +10,26 @@
 
 _Chrome version coming as soon as it is approved in the Web Store…_
 
+## Usage
+
+### Basics
+
+By default, this extension will show an <kbd>Add to Linear</kbd> button on every GitHub issue and PR.
+
+### Enabling more features
+
+You can enable more functionality by authenticating with the Linear API.
+
+Currently, authenticating enables the following features:
+
+- Set the default team and assignee to use when creating a new Linear issue.
+- Show a link to an existing Linear issue instead of the “Add to Linear” button when one exists.
+
+#### How to authenticate with Linear
+
+1. [Create a new personal API key](https://linear.app/settings/api) in the Linear dashboard.
+2. Open the extension options and paste your API key into the **Linear personal API key** field.
+
 ## Contribute
 
 This is an open-source repository. You can
