@@ -1,5 +1,15 @@
 # github-to-linear
 
+## 0.1.0
+
+### Minor Changes
+
+- [`aceb6ef`](https://github.com/delucis/github-to-linear/commit/aceb6ef9e08b4f87c3a19c346a689f90889b7a17) Thanks [@delucis](https://github.com/delucis)! - Add extension options pane to support authenticating with Linear
+
+- [`881ff8a`](https://github.com/delucis/github-to-linear/commit/881ff8a164882b9f8aeefce237fcf895166ba205) Thanks [@delucis](https://github.com/delucis)! - Use user preferences to set default team & assignee in new issue link
+
+- [`881ff8a`](https://github.com/delucis/github-to-linear/commit/881ff8a164882b9f8aeefce237fcf895166ba205) Thanks [@delucis](https://github.com/delucis)! - Show authenticated users a link to an existing Linear issue if found
+
 ## 0.0.2
 
 ### Patch Changes
