@@ -1,0 +1,176 @@
+/*
+Based on the CSS shipped with Refined GitHub:
+https://github.com/refined-github/refined-github
+*/
+
+@import url('chrome://global/skin/in-content/common.css')
+(min--moz-device-pixel-ratio: 0);
+
+:root {
+  --background-color-for-chrome: #292a2d;
+  max-width: 700px;
+  margin: auto;
+}
+
+body {
+  --body-margin-h: 0.5rem;
+  margin-inline: var(--body-margin-h);
+}
+
+/* Selector matches Firefox */
+input[type='text'],
+input:not([type]),
+select {
+  margin-inline-start: 0;
+}
+
+img {
+  vertical-align: middle;
+}
+
+_::-webkit-full-page-media,
+_:future,
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif,
+    'Apple Color Emoji';
+}
+
+_::-webkit-full-page-media,
+_:future,
+input[type='text'],
+input:not([type]),
+select {
+  border: solid 1px #888;
+  padding: 0.4em;
+  font: inherit;
+  -webkit-appearance: none;
+}
+
+@-moz-document url-prefix('') {
+  :root,
+  body {
+    --body-margin-h: 6px;
+    color: var(--in-content-page-color);
+
+    /* Also supports dark themes in Firefox */
+    /* !important is to override the dark-mode setting for Chrome below */
+    background-color: var(--in-content-box-background) !important;
+    min-height: 250px; /* Without this thereâ€™s a white space at the bottom in dark mode */
+  }
+
+  body > * {
+    margin-inline: var(--body-margin-h);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    background-color: var(--background-color-for-chrome);
+  }
+
+  body,
+  h3 {
+    /* Chrome #3 */
+    color: var(--in-content-page-color, #e8eaed);
+  }
+
+  a {
+    color: var(--in-content-link-color, #8ab4f8);
+  }
+
+  input[type='text'],
+  input:not([type]) {
+    color: inherit;
+    background-color: transparent;
+  }
+}
+
+/* ======================================= */
+
+@media not screen and (width: 400px) {
+  /* Excludes Edge */
+  :root {
+    min-width: 550px;
+  }
+}
+
+html::after {
+  /* Add some extra scroll to the page to reduce section toggle jumps/scroll */
+  content: '';
+  display: block;
+  height: 70vh;
+  background: url('../images/icon-128.png') center/6rem no-repeat;
+  filter: opacity(0.1) saturate(0) brightness(1.2);
+}
+
+p {
+  margin-top: 0;
+}
+
+ul {
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+details {
+  margin-bottom: 1em;
+}
+
+details[open] {
+  --border-left: 0.25rem;
+  border-inline-start: solid var(--border-left) #aaa4;
+  padding-bottom: 1px;
+}
+
+summary {
+  --summary-padding: 0.625rem;
+  background: #aaa1;
+  list-style: none;
+  padding: var(--summary-padding);
+  cursor: pointer;
+}
+
+summary::-webkit-details-marker {
+  display: none; /* Just for Safari. Chrome uses `list-style` */
+}
+
+summary:hover {
+  background: #aaa4;
+}
+
+details[open] summary {
+  margin-bottom: 10px;
+  padding-inline-start: calc(var(--summary-padding) - var(--border-left));
+}
+
+details[open] > :not(summary) {
+  margin-inline-start: 0.625rem;
+}
+
+:root [name='pat'] {
+  /* Same as GitHub style for `code` */
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace !important;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  padding-block: 0.5rem !important;
+}
+
+[name='pat'] {
+  width: 20em !important; /* https://github.com/refined-github/refined-github/issues/1374#issuecomment-397906701 */
+  display: inline-block !important;
+}
+
+form label {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 600;
+}
+
+[aria-live] {
+  background-color: #aaa1;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+}

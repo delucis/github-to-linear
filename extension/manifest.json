@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "GitHub to Linear",
   "version": "0.0.0",
   "description": "Quickly create a Linear ticket from any GitHub PR or issue.",
@@ -10,6 +10,11 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
+  "permissions": [
+    "storage",
+    "https://github.com/*",
+    "https://api.linear.app/*"
+  ],
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
@@ -17,6 +22,11 @@
       "exclude_matches": ["https://*/login/*"]
     }
   ],
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false,
+    "chrome_style": true
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "{51c088ab-6ad6-455e-8988-8c7801ea2487}"

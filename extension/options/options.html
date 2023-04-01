@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <title>GitHub to Linear options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <details open>
+      <summary><strong>🔑 Authentication</strong></summary>
+      <form id="authentication-form">
+        <p>
+          Adding an API key enables advanced functionality.
+          <a href="https://linear.app/settings/api">Create one in Linear →</a>
+        </p>
+        <p>
+          <label>
+            Linear personal API key
+            <input type="text" name="pat" id="pat" />
+          </label>
+        </p>
+        <p id="status" aria-live="polite">&nbsp;</p>
+      </form>
+    </details>
+
+    <details>
+      <summary><strong>⚙️ Defaults</strong></summary>
+      <p>
+        <em>(Set a Linear personal API key above to enable these options.)</em>
+      </p>
+      <p>These defaults will be used when creating a new Linear issue.</p>
+      <form id="preferences-form"></form>
+    </details>
+
+    <script src="options.js"></script>
+  </body>
+</html>
