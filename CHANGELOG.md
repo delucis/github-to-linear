@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.1.1
+
+### Patch Changes
+
+- [`87338a8`](https://github.com/delucis/github-to-linear/commit/87338a8f1934bf3a0e4e0dfbbd54ec466e412499) Thanks [@delucis](https://github.com/delucis)! - Refactor content script styling to use CSS file instead of inline style attributes.
+
 ## 0.1.0
 
 ### Minor Changes
