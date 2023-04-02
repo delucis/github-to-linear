@@ -12,7 +12,8 @@
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.1"
+    "@changesets/cli": "^2.26.1",
+    "chrome-types": "^0.1.181"
   },
   "packageManager": "pnpm@8.1.0"
 }

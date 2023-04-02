@@ -7,6 +7,9 @@ devDependencies:
   '@changesets/cli':
     specifier: ^2.26.1
     version: 2.26.1
+  chrome-types:
+    specifier: ^0.1.181
+    version: 0.1.181
 
 packages:
 
@@ -426,6 +429,10 @@ packages:
 
   /chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+    dev: true
+
+  /chrome-types@0.1.181:
+    resolution: {integrity: sha512-Gm7BtV8XPjYYEWwZI9tC0LUicZnWWc+Ti8qMta2rOUzy0+7XMHfY3KmAW8lOEpM7zDQsQXLZz5Xx52lo4mAFsQ==}
     dev: true
 
   /ci-info@3.8.0:
