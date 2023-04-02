@@ -2,3 +2,5 @@
 node_modules
 extension.zip
 dist
+resources/web-ext-profile/*
+!resources/web-ext-profile/.gitkeep
