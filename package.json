@@ -6,7 +6,9 @@
   "author": "delucis",
   "license": "GPL-3.0",
   "scripts": {
-    "build": "node ./scripts/build.mjs"
+    "build": "node ./scripts/build.mjs",
+    "dev": "pnpm dlx web-ext@7 run --source-dir ./extension",
+    "dev:chrome": "pnpm dlx web-ext@7 run --source-dir ./extension --target=chromium"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.8",
