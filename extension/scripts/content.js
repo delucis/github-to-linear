@@ -55,23 +55,15 @@ async function injectUI() {
   if (linearIssue) {
     // Empty span to draw a vertical separator
     const separator = document.createElement('span');
-    separator.style.height = '1.25em';
-    separator.style.borderInlineStart = '1px solid var(--color-btn-border)';
-    separator.style.marginInline = '0.125rem';
+    separator.classList.add('gh2l-issue-separator');
     linkEl.append(separator);
     const status = document.createElement('span');
     status.textContent = linearIssue.state.name;
-    status.style.fontWeight = '400';
-    status.style.opacity = '0.8';
+    status.classList.add('gh2l-issue-status');
     linkEl.append(status);
   }
   // Add some minimal styles.
-  linkEl.style.display = 'flex';
-  linkEl.style.gap = '0.25rem';
-  linkEl.style.alignItems = 'center';
-  linkEl.style.alignSelf = 'flex-start';
-  linkEl.style.marginInlineStart = 'auto';
-  linkEl.classList.add('btn', 'btn-sm');
+  linkEl.classList.add('btn', 'btn-sm', 'gh2l-issue-btn');
   // Inject the link into the page.
   headerMeta.appendChild(linkEl);
 }

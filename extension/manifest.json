@@ -18,6 +18,7 @@
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
+      "css": ["scripts/content.css"],
       "matches": ["https://github.com/*"],
       "exclude_matches": ["https://*/login/*"]
     }
