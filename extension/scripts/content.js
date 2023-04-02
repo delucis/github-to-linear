@@ -43,29 +43,41 @@ async function injectUI() {
   const linkText = linearIssue ? linearIssue.identifier : 'Add to Linear';
 
   // Create a link to an existing issue or to create a new issue on Linear.
-  const linkEl = document.createElement('a');
-  linkEl.id = linkId;
-  linkEl.href = linearIssue
-    ? linearIssue.url
-    : await getNewIssueUrl(title, description);
+  const linkEl = h('a', {
+    id: linkId,
+    href: linearIssue
+      ? linearIssue.url
+      : await getNewIssueUrl(title, description),
+  });
   // Add link text and the Linear logo as an inline SVG.
   linkEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 100 100" width="16" height="16" aria-hidden="true"><path fill="#5E6AD2" d="M1.2254 61.5228c-.2225-.9485.9075-1.5459 1.5964-.857l36.5124 36.5124c.6889.6889.0915 1.8189-.857 1.5964C20.0515 94.4522 5.5478 79.9485 1.2254 61.5228ZM.002 46.8891a.9896.9896 0 0 0 .2896.7606l52.0588 52.0588a.9887.9887 0 0 0 .7606.2896 50.0747 50.0747 0 0 0 6.9624-.9259c.7645-.157 1.0301-1.0963.4782-1.6481L2.576 39.4485c-.552-.5519-1.4912-.2863-1.6482.4782a50.0671 50.0671 0 0 0-.926 6.9624Zm4.209-17.1837c-.1665.3738-.0817.8106.2077 1.1l64.776 64.776c.2894.2894.7262.3742 1.1.2077a49.9079 49.9079 0 0 0 5.1855-2.684c.5521-.328.6373-1.0867.1832-1.5407L8.4357 24.3367c-.4541-.4541-1.2128-.3689-1.5408.1832a49.8961 49.8961 0 0 0-2.684 5.1855Zm8.4478-11.6314c-.3701-.3701-.393-.9637-.0443-1.3541C21.7795 6.4593 35.1114 0 49.9519 0 77.5927 0 100 22.4073 100 50.0481c0 14.8405-6.4593 28.1724-16.7199 37.3375-.3903.3487-.984.3258-1.3542-.0443L12.6587 18.074Z"/></svg>
   <span>${linkText}</span>`;
   // If we found an existing issue, add its status to the link.
   if (linearIssue) {
-    // Empty span to draw a vertical separator
-    const separator = document.createElement('span');
-    separator.classList.add('gh2l-issue-separator');
-    linkEl.append(separator);
-    const status = document.createElement('span');
-    status.textContent = linearIssue.state.name;
-    status.classList.add('gh2l-issue-status');
-    linkEl.append(status);
+    linkEl.append(h('span', { class: 'gh2l-issue-separator' }));
+    linkEl.append(
+      h('span', { class: 'gh2l-issue-status' }, linearIssue.state.name)
+    );
   }
   // Add some minimal styles.
   linkEl.classList.add('btn', 'btn-sm', 'gh2l-issue-btn');
   // Inject the link into the page.
   headerMeta.appendChild(linkEl);
+}
+
+/**
+ * Helper to build trees of HTML elements more quickly.
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag The name of an element to create, e.g. `'div'` or `'h1'`.
+ * @param {Record<string, string>} attrs A map of attribute keys to attribute values.
+ * @param  {(string | Node)[]} children Any number of child nodes to include in the created element. Strings will be inserted as `Text` nodes.
+ * @returns {HTMLElementTagNameMap[K]}
+ */
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const key in attrs) el.setAttribute(key, attrs[key]);
+  el.append(...children);
+  return el;
 }
 
 /**
