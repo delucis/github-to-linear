@@ -4,9 +4,8 @@ env:
   WEB_EXT_SOURCE_DIR: dist
 
 on:
-  push:
-    tags:
-      - v**
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
