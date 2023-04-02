@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.1.2
+
+### Patch Changes
+
+- [`3ed37cb`](https://github.com/delucis/github-to-linear/commit/3ed37cbf43f1a6380ed36c5317266bae1f873485) Thanks [@delucis](https://github.com/delucis)! - Simplify DOM code with `h` helper function
+
 ## 0.1.1
 
 ### Patch Changes
