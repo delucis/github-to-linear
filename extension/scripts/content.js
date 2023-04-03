@@ -49,21 +49,20 @@ async function injectUI() {
       href: linearIssue
         ? linearIssue.url
         : await getNewIssueUrl(title, description),
+      class: 'btn btn-sm gh2l-issue-btn',
     },
     LinearLogo(),
     h('span', {}, linearIssue ? linearIssue.identifier : 'Add to Linear')
   );
   // If we found an existing issue, add its status to the link.
   if (linearIssue) {
-    linkEl.append(h('span', { class: 'gh2l-issue-separator' }));
     linkEl.append(
+      h('span', { class: 'gh2l-issue-separator' }),
       h('span', { class: 'gh2l-issue-status' }, linearIssue.state.name)
     );
   }
-  // Add some minimal styles.
-  linkEl.classList.add('btn', 'btn-sm', 'gh2l-issue-btn');
   // Inject the link into the page.
-  headerMeta.appendChild(linkEl);
+  headerMeta.append(linkEl);
 }
 
 /**
