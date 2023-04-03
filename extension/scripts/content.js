@@ -138,7 +138,15 @@ function injectSidebarUI(issues) {
             h(
               'summary',
               { class: 'f6 px-2 pb-1 Link--primary text-bold' },
-              `${nMore} more issue${nMore > 1 ? s : ''}`
+              h(
+                'span',
+                {
+                  class: 'd-inline-flex gap-1 flex-items-center',
+                  style: 'vertical-align: middle;',
+                },
+                ...moreIssues.map((issue) => StatusIcon(issue.state)),
+                `${nMore} more issue${nMore > 1 ? s : ''}`
+              )
             ),
             ...moreIssues.map(IssueInfobox)
           )
