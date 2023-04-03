@@ -25,6 +25,7 @@ Currently, authenticating enables the following features:
 
 - Set the default team and assignee to use when creating a new Linear issue.
 - Show a link to an existing Linear issue instead of the “Add to Linear” button when one exists.
+- Show a detailed card for an existing Linear issue in the sidebar of GitHub issues and PRs.
 
 #### How to authenticate with Linear
 
