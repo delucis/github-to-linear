@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.2.1
+
+### Patch Changes
+
+- [#10](https://github.com/delucis/github-to-linear/pull/10) [`38735bb`](https://github.com/delucis/github-to-linear/commit/38735bb34195f1a7160db88ce24fb1dfe43ac6dc) Thanks [@delucis](https://github.com/delucis)! - Fix built extension manifest for Chromium browsers.
+
 ## 0.2.0
 
 ### Minor Changes
