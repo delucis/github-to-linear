@@ -310,7 +310,12 @@ function InfoboxHeading(linearIssue) {
         class: 'Link--primary gh2l-icon-text-lockup',
       },
       LinearLogo(linearIssue.team.color),
-      h('span', { class: 'text-bold' }, linearIssue.identifier)
+      h(
+        'span',
+        { class: 'Truncate gap-1' },
+        h('span', { class: 'text-bold' }, linearIssue.identifier, ' '),
+        h('span', { class: 'Truncate-text color-fg-muted' }, linearIssue.title)
+      )
     )
   );
 }
@@ -427,6 +432,7 @@ async function getNewIssueUrl(title, description) {
  * @returns {Promise<null | Array<{
  *  url: string;
  *  identifier: string;
+ *  title: string;
  *  state: { name: string; color: string; type: string }
  *  priorityLabel: string;
  *  priority: number;
@@ -458,6 +464,7 @@ async function fetchExistingIssues(issueUrl, identifier) {
     nodes {
       url
       identifier
+      title
       state { name color type }
       priorityLabel
       priority
