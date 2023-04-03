@@ -16,3 +16,119 @@
   border-inline-start: 1px solid var(--color-btn-border);
   margin-inline: 0.125rem;
 }
+
+/* Issue card. */
+.gh2l-issue-infobox td,
+.gh2l-issue-infobox th {
+  padding-block: 0.125rem;
+}
+.gh2l-issue-infobox th {
+  width: 5.5em;
+  font-weight: 500;
+}
+
+/**
+ * Utility for spacing the micro-layout of some kind of icon followed by text.
+ * For example a user avatar + user name.
+ */
+.gh2l-icon-text-lockup {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: 0.5em;
+  align-items: center;
+}
+.gh2l-icon-text-lockup > :first-child {
+  justify-self: center;
+}
+
+/* Issue card status row. */
+.gh2l-status-indicator {
+  --gh2l-status-indicator-size: 0.875rem;
+  --gh2l-status-fill-size: 0%;
+  --gh2l-status-border-style: solid;
+  --gh2l-status-border-width: 0.125rem;
+  position: relative;
+  display: inline-block;
+  width: var(--gh2l-status-indicator-size);
+  height: var(--gh2l-status-indicator-size);
+}
+.gh2l-status-indicator::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  inset: 0;
+  border: var(--gh2l-status-border-width) var(--gh2l-status-border-style)
+    var(--gh2l-status-color);
+}
+.gh2l-status-indicator::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  inset: calc(50% - 0.5 * var(--gh2l-status-fill-size));
+  background-color: var(--gh2l-status-color);
+}
+.gh2l-status-backlog {
+  --gh2l-status-border-style: dashed;
+  --gh2l-status-border-width: 1.5px;
+}
+.gh2l-status-unstarted {
+  --gh2l-status-fill-size: 0;
+}
+.gh2l-status-started {
+  --gh2l-status-fill-size: calc(6 / 14 * var(--gh2l-status-indicator-size));
+}
+.gh2l-status-completed,
+.gh2l-status-canceled {
+  --gh2l-status-fill-size: var(--gh2l-status-indicator-size);
+}
+
+/* Issue card priority row. */
+/* 0 = no priority; 1 = urgent; 2 = high; 3 = medium; 4 = low */
+.gh2l-priority-indicator {
+  display: inline-flex;
+  fill: currentColor;
+}
+.gh2l-priority-3 rect:nth-of-type(3),
+.gh2l-priority-4 rect:nth-of-type(3) {
+  opacity: 0.4;
+}
+.gh2l-priority-4 rect:nth-of-type(2) {
+  opacity: 0.4;
+}
+
+/* Issue card assignee row. */
+.gh2l-assignee:hover {
+  text-decoration: none !important;
+}
+.gh2l-assignee:hover > :nth-child(n + 2) {
+  text-decoration: underline;
+}
+.gh2l-assignee-is-me {
+  color: var(--color-user-mention-fg);
+  background-color: var(--color-user-mention-bg);
+  border-radius: 99rem;
+  padding-inline-end: 0.75em;
+  font-weight: bold;
+  width: max-content;
+}
+.gh2l-assignee-avatar-placeholder {
+  width: 1rem;
+  height: 1rem;
+  line-height: 1rem !important;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-fg-muted);
+  font-size: 0.83em;
+  font-weight: bold;
+}
+
+/* Issue card labels. */
+.gh2l-label::before {
+  content: '';
+  display: inline-block;
+  background-color: var(--gh2l-label-color);
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 100%;
+  margin-right: 0.3em;
+}
