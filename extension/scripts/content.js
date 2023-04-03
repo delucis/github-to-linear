@@ -313,7 +313,12 @@ function InfoboxHeading(linearIssue) {
       h(
         'span',
         { class: 'Truncate gap-1' },
-        h('span', { class: 'text-bold' }, linearIssue.identifier, ' '),
+        h(
+          'span',
+          { class: 'text-bold flex-shrink-0' },
+          linearIssue.identifier,
+          ' '
+        ),
         h('span', { class: 'Truncate-text color-fg-muted' }, linearIssue.title)
       )
     )
