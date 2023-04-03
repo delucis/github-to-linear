@@ -34,20 +34,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm i
 
-      - name: Build extension
-        run: pnpm build
-
-      - name: Submit to Mozilla
+      - name: Build and submit to Mozilla
         if: matrix.command == 'Firefox'
-        run: npx web-ext-submit@7
+        run: pnpm build && npx web-ext-submit@7
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
 
-      - name: Submit to Google
+      - name: Build and submit to Google
         if: matrix.command == 'Chrome'
         working-directory: ${{ env.WEB_EXT_SOURCE_DIR }}
-        run: npx chrome-webstore-upload-cli@2 upload --auto-publish
+        run: pnpm build:chrome && npx chrome-webstore-upload-cli@2 upload --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
