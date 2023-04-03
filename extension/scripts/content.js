@@ -175,6 +175,7 @@ async function fetchExistingIssue(issueUrl, identifier) {
   }
 }`,
       },
+      // @ts-expect-error `chrome-types` doesn’t cover this signature, but it does work.
       (response) => resolve(response)
     );
   });
