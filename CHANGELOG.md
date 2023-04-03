@@ -1,5 +1,13 @@
 # github-to-linear
 
+## 0.3.0
+
+### Minor Changes
+
+- [#15](https://github.com/delucis/github-to-linear/pull/15) [`897550f`](https://github.com/delucis/github-to-linear/commit/897550f42e86a99e3a47b533219ee2858869ac2d) Thanks [@delucis](https://github.com/delucis)! - Display a Linear issue’s title in sidebar cards.
+
+- [#13](https://github.com/delucis/github-to-linear/pull/13) [`2d8ab8d`](https://github.com/delucis/github-to-linear/commit/2d8ab8d16054b92bb8c82c7a54a21f949e467345) Thanks [@delucis](https://github.com/delucis)! - Support displaying multiple linked issues in the GitHub sidebar. Collapsed by default, you can unfold this to see all Linear issues associated with the current issue/PR.
+
 ## 0.2.1
 
 ### Patch Changes
