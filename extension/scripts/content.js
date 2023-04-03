@@ -123,7 +123,28 @@ function injectSidebarUI(issues) {
     return;
   }
 
-  sidebar.prepend(h('div', { id }, IssueInfobox(issues[0])));
+  const [firstIssue, ...moreIssues] = issues;
+  const nMore = moreIssues.length;
+
+  sidebar.prepend(
+    h(
+      'div',
+      { id },
+      IssueInfobox(firstIssue),
+      nMore > 0
+        ? h(
+            'details',
+            {},
+            h(
+              'summary',
+              { class: 'f6 px-2 pb-1 Link--primary text-bold' },
+              `${nMore} more issue${nMore > 1 ? s : ''}`
+            ),
+            ...moreIssues.map(IssueInfobox)
+          )
+        : ''
+    )
+  );
 }
 
 /**
@@ -264,7 +285,7 @@ function IssueInfobox(linearIssue) {
 
   return h(
     'div',
-    { class: 'gh2l-issue-infobox border f6 mb-2 p-2 rounded-2' },
+    { class: 'gh2l-issue-infobox border f6 mb-1 p-2 rounded-2' },
     InfoboxHeading(linearIssue),
     h('table', {}, statusRow, priorityRow, assigneeRow),
     h('div', { class: 'border-top my-2' }),
