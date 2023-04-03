@@ -1,5 +1,13 @@
 # github-to-linear
 
+## 0.3.1
+
+### Patch Changes
+
+- [`a803ca4`](https://github.com/delucis/github-to-linear/commit/a803ca43332d98d44ea563bf901117853b00e2b3) Thanks [@delucis](https://github.com/delucis)! - Fix small styling bug in issue card headings.
+
+- [`30b1cd3`](https://github.com/delucis/github-to-linear/commit/30b1cd3e8c801be5c8885ab47cdb999188fe3790) Thanks [@delucis](https://github.com/delucis)! - Tweak wording of manifest description field to reflect newer features.
+
 ## 0.3.0
 
 ### Minor Changes
