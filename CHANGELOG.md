@@ -1,5 +1,13 @@
 # github-to-linear
 
+## 0.1.3
+
+### Patch Changes
+
+- [`715487c`](https://github.com/delucis/github-to-linear/commit/715487c94e7db976d7d905b422556b4e8d99edfa) Thanks [@delucis](https://github.com/delucis)! - Ignore inaccurate type error
+
+- [`b7a3c62`](https://github.com/delucis/github-to-linear/commit/b7a3c62e2a86aa21097605fedf6c05e42f020605) Thanks [@delucis](https://github.com/delucis)! - Simplify SVG DOM code with `s` helper function
+
 ## 0.1.2
 
 ### Patch Changes
