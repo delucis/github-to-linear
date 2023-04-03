@@ -1,5 +1,15 @@
 # github-to-linear
 
+## 0.2.0
+
+### Minor Changes
+
+- [#7](https://github.com/delucis/github-to-linear/pull/7) [`3a73585`](https://github.com/delucis/github-to-linear/commit/3a73585dab63782342f6756726e4d6fd16dea5ea) Thanks [@delucis](https://github.com/delucis)! - Display a card with details about a linked Linear issue if found
+
+### Patch Changes
+
+- [`87b927d`](https://github.com/delucis/github-to-linear/commit/87b927d074b179d55363a8b6680d0dc8ee786917) Thanks [@delucis](https://github.com/delucis)! - Small refactor of link creation code
+
 ## 0.1.3
 
 ### Patch Changes
