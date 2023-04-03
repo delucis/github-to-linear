@@ -39,7 +39,8 @@ async function injectUI() {
   const typeLabel = type === 'pull' ? 'PR' : 'Issue';
   const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
 
-  const linearIssue = await fetchExistingIssue(cleanUrl(), identifier);
+  const issues = await fetchExistingIssues(cleanUrl(), identifier);
+  const linearIssue = issues?.[0];
 
   // Create a link to an existing issue or to create a new issue on Linear.
   const linkEl = h(
@@ -63,7 +64,7 @@ async function injectUI() {
   }
   // Inject the link into the page.
   headerMeta.append(linkEl);
-  injectIssueInfobox(linearIssue);
+  injectSidebarUI(issues);
 }
 
 /**
@@ -107,18 +108,57 @@ function hFactory(tag, attrs = {}) {
 }
 
 /**
- * @param {Awaited<ReturnType<typeof fetchExistingIssue>>} linearIssue
+ *
+ * @param {Awaited<ReturnType<typeof fetchExistingIssues>>} issues
  */
-function injectIssueInfobox(linearIssue) {
+function injectSidebarUI(issues) {
   /** ID for the infobox we’ll create. */
   const id = 'github-to-linear-issue-infobox';
-  if (!linearIssue || document.getElementById(id) || isPrSubView()) return;
+  if (!issues?.length || document.getElementById(id) || isPrSubView()) {
+    return;
+  }
   const sidebar = document.querySelector('.Layout-sidebar');
   if (!sidebar) {
     console.error('Could not find page sidebar.');
     return;
   }
 
+  const [firstIssue, ...moreIssues] = issues;
+  const nMore = moreIssues.length;
+
+  sidebar.prepend(
+    h(
+      'div',
+      { id },
+      IssueInfobox(firstIssue),
+      nMore > 0
+        ? h(
+            'details',
+            {},
+            h(
+              'summary',
+              { class: 'f6 px-2 pb-1 Link--primary text-bold' },
+              h(
+                'span',
+                {
+                  class: 'd-inline-flex gap-1 flex-items-center',
+                  style: 'vertical-align: middle;',
+                },
+                ...moreIssues.map((issue) => StatusIcon(issue.state)),
+                `${nMore} more issue${nMore > 1 ? s : ''}`
+              )
+            ),
+            ...moreIssues.map(IssueInfobox)
+          )
+        : ''
+    )
+  );
+}
+
+/**
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]} linearIssue
+ */
+function IssueInfobox(linearIssue) {
   const { assignee, cycle, project } = linearIssue;
 
   const TableRow = hFactory('tr');
@@ -133,10 +173,7 @@ function injectIssueInfobox(linearIssue) {
       h(
         'span',
         { class: 'gh2l-icon-text-lockup' },
-        h('span', {
-          class: `gh2l-status-indicator gh2l-status-${linearIssue.state.type}`,
-          style: `--gh2l-status-color:${linearIssue.state.color};`,
-        }),
+        StatusIcon(linearIssue.state),
         h('span', {}, linearIssue.state.name)
       )
     )
@@ -251,16 +288,14 @@ function injectIssueInfobox(linearIssue) {
         )
       : '';
 
-  const infobox = h(
+  return h(
     'div',
-    { class: 'gh2l-issue-infobox border f6 mb-2 p-2 rounded-2', id },
+    { class: 'gh2l-issue-infobox border f6 mb-1 p-2 rounded-2' },
     InfoboxHeading(linearIssue),
     h('table', {}, statusRow, priorityRow, assigneeRow),
     h('div', { class: 'border-top my-2' }),
     h('table', {}, cycleRow, projectRow, dueDateRow, labelsRow)
   );
-
-  sidebar.prepend(infobox);
 }
 
 /** Render the title of the issue infobox. */
@@ -295,6 +330,17 @@ function LinearLogo(color = '#5E6AD2') {
       d: 'M1.2254 61.5228c-.2225-.9485.9075-1.5459 1.5964-.857l36.5124 36.5124c.6889.6889.0915 1.8189-.857 1.5964C20.0515 94.4522 5.5478 79.9485 1.2254 61.5228ZM.002 46.8891a.9896.9896 0 0 0 .2896.7606l52.0588 52.0588a.9887.9887 0 0 0 .7606.2896 50.0747 50.0747 0 0 0 6.9624-.9259c.7645-.157 1.0301-1.0963.4782-1.6481L2.576 39.4485c-.552-.5519-1.4912-.2863-1.6482.4782a50.0671 50.0671 0 0 0-.926 6.9624Zm4.209-17.1837c-.1665.3738-.0817.8106.2077 1.1l64.776 64.776c.2894.2894.7262.3742 1.1.2077a49.9079 49.9079 0 0 0 5.1855-2.684c.5521-.328.6373-1.0867.1832-1.5407L8.4357 24.3367c-.4541-.4541-1.2128-.3689-1.5408.1832a49.8961 49.8961 0 0 0-2.684 5.1855Zm8.4478-11.6314c-.3701-.3701-.393-.9637-.0443-1.3541C21.7795 6.4593 35.1114 0 49.9519 0 77.5927 0 100 22.4073 100 50.0481c0 14.8405-6.4593 28.1724-16.7199 37.3375-.3903.3487-.984.3258-1.3542-.0443L12.6587 18.074Z',
     })
   );
+}
+
+/**
+ * Render an issue status icon, similar to Linear’s style.
+ * @param {{ type: string; color: string }} state
+ */
+function StatusIcon({ type, color }) {
+  return h('span', {
+    class: `gh2l-status-indicator gh2l-status-${type}`,
+    style: `--gh2l-status-color:${color};`,
+  });
 }
 
 /**
@@ -378,7 +424,7 @@ async function getNewIssueUrl(title, description) {
  * - The issue has an attachment linking back to the current page.
  * @param {string} issueUrl URL for the current issue or PR
  * @param {string} identifier Short-form identifier in the form of `{org}/{repo}#{number}`
- * @returns {Promise<null | {
+ * @returns {Promise<null | Array<{
  *  url: string;
  *  identifier: string;
  *  state: { name: string; color: string; type: string }
@@ -390,9 +436,9 @@ async function getNewIssueUrl(title, description) {
  *  dueDate?: `${number}-${number}-${number}`
  *  labels: { nodes: { name: string; color: string }[] }
  *  team: { color?: string }
- * }>}
+ * }>>}
  */
-async function fetchExistingIssue(issueUrl, identifier) {
+async function fetchExistingIssues(issueUrl, identifier) {
   const response = await new Promise((resolve) => {
     // Use callback-style of sendMessage because Promise-style requires Manifest v3 in Chrome.
     chrome.runtime.sendMessage(
@@ -408,7 +454,6 @@ async function fetchExistingIssue(issueUrl, identifier) {
         { attachments: { url: { containsIgnoreCase: "${issueUrl}" } } }
       ]
     }
-    first: 1
   ) {
     nodes {
       url
@@ -432,7 +477,7 @@ async function fetchExistingIssue(issueUrl, identifier) {
       (response) => resolve(response)
     );
   });
-  return response?.data?.issueSearch?.nodes?.[0] || null;
+  return response?.data?.issueSearch?.nodes || null;
 }
 
 /** Get the current URL without any query params or fragment hashes. */
