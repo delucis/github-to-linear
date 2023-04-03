@@ -43,8 +43,7 @@ jobs:
 
       - name: Build and submit to Google
         if: matrix.command == 'Chrome'
-        working-directory: ${{ env.WEB_EXT_SOURCE_DIR }}
-        run: pnpm build:chrome && npx chrome-webstore-upload-cli@2 upload --auto-publish
+        run: pnpm build:chrome && cd $WEB_EXT_SOURCE_DIR && npx chrome-webstore-upload-cli@2 upload --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
