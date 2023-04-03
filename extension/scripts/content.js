@@ -63,6 +63,7 @@ async function injectUI() {
   }
   // Inject the link into the page.
   headerMeta.append(linkEl);
+  injectIssueInfobox(linearIssue);
 }
 
 /**
@@ -94,6 +95,191 @@ function s(tag, attrs = {}, ...children) {
   return el;
 }
 
+/**
+ * Get a curried `h` for a specific tag.
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag
+ * @param {Record<string, string>} attrs
+ */
+function hFactory(tag, attrs = {}) {
+  /** @param {(string | Node)[]} children */
+  return (...children) => h(tag, attrs, ...children);
+}
+
+/**
+ * @param {Awaited<ReturnType<typeof fetchExistingIssue>>} linearIssue
+ */
+function injectIssueInfobox(linearIssue) {
+  /** ID for the infobox we’ll create. */
+  const id = 'github-to-linear-issue-infobox';
+  if (!linearIssue || document.getElementById(id) || isPrSubView()) return;
+  const sidebar = document.querySelector('.Layout-sidebar');
+  if (!sidebar) {
+    console.error('Could not find page sidebar.');
+    return;
+  }
+
+  const { assignee, cycle, project } = linearIssue;
+
+  const TableRow = hFactory('tr');
+  const TableHeader = hFactory('th', {
+    class: 'text-left pr-2 color-fg-muted',
+  });
+  const TableCell = hFactory('td');
+
+  const statusRow = TableRow(
+    TableHeader('Status'),
+    TableCell(
+      h(
+        'span',
+        { class: 'gh2l-icon-text-lockup' },
+        h('span', {
+          class: `gh2l-status-indicator gh2l-status-${linearIssue.state.type}`,
+          style: `--gh2l-status-color:${linearIssue.state.color};`,
+        }),
+        h('span', {}, linearIssue.state.name)
+      )
+    )
+  );
+
+  const priorityRow = TableRow(
+    TableHeader('Priority'),
+    TableCell(
+      h(
+        'span',
+        {
+          class: [
+            'gh2l-icon-text-lockup',
+            linearIssue.priority === 0 ? 'color-fg-muted' : '',
+          ].join(' '),
+        },
+        PriorityIcon(linearIssue.priority),
+        h('span', {}, linearIssue.priorityLabel)
+      )
+    )
+  );
+
+  const assigneeRow = TableRow(
+    TableHeader('Assignee'),
+    TableCell(
+      assignee
+        ? h(
+            'a',
+            {
+              href: assignee.url,
+              class:
+                'gh2l-assignee gh2l-icon-text-lockup' +
+                (assignee.isMe ? ' gh2l-assignee-is-me' : ''),
+            },
+            assignee.avatarUrl
+              ? h('img', {
+                  src: assignee.avatarUrl,
+                  width: '16',
+                  height: '16',
+                  class: 'gh2l-assignee-avatar avatar avatar-user',
+                })
+              : h(
+                  'span',
+                  {
+                    class: 'gh2l-assignee-avatar-placeholder avatar',
+                  },
+                  assignee.displayName[0]
+                ),
+            h('span', {}, assignee.displayName)
+          )
+        : h('span', { class: 'color-fg-muted' }, 'Unassigned')
+    )
+  );
+
+  /** @type {undefined | 'past' | 'present' | 'future'} */
+  let cycleStatus;
+  if (cycle) {
+    const now = Date.now();
+    const cycleStart = new Date(cycle.startsAt).getTime();
+    const cycleEnd = new Date(cycle.endsAt).getTime();
+    if (cycleStart > now) {
+      cycleStatus = 'future';
+    } else if (cycleEnd < now) {
+      cycleStatus = 'past';
+    } else {
+      cycleStatus = 'present';
+    }
+  }
+  const isCurrentCycle = cycleStatus === 'present';
+  const cycleRow = TableRow(
+    TableHeader('Cycle'),
+    TableCell(
+      cycle
+        ? h(
+            isCurrentCycle ? 'strong' : 'span',
+            { class: cycleStatus === 'past' ? 'color-fg-muted' : '' },
+            cycle.name || ''
+          )
+        : h('span', { class: 'color-fg-muted' }, 'not set'),
+      isCurrentCycle ? ' (current)' : ''
+    )
+  );
+
+  const projectRow = TableRow(
+    TableHeader('Project'),
+    TableCell(
+      (project && h('a', { href: project.url }, project.name)) ||
+        h('span', { class: 'color-fg-muted' }, 'not set')
+    )
+  );
+
+  const dueDateRow = linearIssue.dueDate
+    ? TableRow(TableHeader('Due'), TableCell(linearIssue.dueDate))
+    : '';
+
+  const labelsRow =
+    linearIssue.labels.nodes.length > 0
+      ? TableRow(
+          TableHeader('Labels'),
+          TableCell(
+            ...linearIssue.labels.nodes.map((label) =>
+              h(
+                'span',
+                {
+                  class: 'gh2l-label Label Label--inline',
+                  style: `--gh2l-label-color: ${label.color}`,
+                },
+                label.name
+              )
+            )
+          )
+        )
+      : '';
+
+  const infobox = h(
+    'div',
+    { class: 'gh2l-issue-infobox border f6 mb-2 p-2 rounded-2', id },
+    InfoboxHeading(linearIssue),
+    h('table', {}, statusRow, priorityRow, assigneeRow),
+    h('div', { class: 'border-top my-2' }),
+    h('table', {}, cycleRow, projectRow, dueDateRow, labelsRow)
+  );
+
+  sidebar.prepend(infobox);
+}
+
+/** Render the title of the issue infobox. */
+function InfoboxHeading(linearIssue) {
+  return h(
+    'p',
+    {},
+    h(
+      'a',
+      {
+        href: linearIssue.url,
+        class: 'Link--primary gh2l-icon-text-lockup',
+      },
+      LinearLogo(linearIssue.team.color),
+      h('span', { class: 'text-bold' }, linearIssue.identifier)
+    )
+  );
+}
+
 /** Render the Linear Logo as an inline SVG. */
 function LinearLogo(color = '#5E6AD2') {
   return s(
@@ -108,6 +294,52 @@ function LinearLogo(color = '#5E6AD2') {
       fill: color,
       d: 'M1.2254 61.5228c-.2225-.9485.9075-1.5459 1.5964-.857l36.5124 36.5124c.6889.6889.0915 1.8189-.857 1.5964C20.0515 94.4522 5.5478 79.9485 1.2254 61.5228ZM.002 46.8891a.9896.9896 0 0 0 .2896.7606l52.0588 52.0588a.9887.9887 0 0 0 .7606.2896 50.0747 50.0747 0 0 0 6.9624-.9259c.7645-.157 1.0301-1.0963.4782-1.6481L2.576 39.4485c-.552-.5519-1.4912-.2863-1.6482.4782a50.0671 50.0671 0 0 0-.926 6.9624Zm4.209-17.1837c-.1665.3738-.0817.8106.2077 1.1l64.776 64.776c.2894.2894.7262.3742 1.1.2077a49.9079 49.9079 0 0 0 5.1855-2.684c.5521-.328.6373-1.0867.1832-1.5407L8.4357 24.3367c-.4541-.4541-1.2128-.3689-1.5408.1832a49.8961 49.8961 0 0 0-2.684 5.1855Zm8.4478-11.6314c-.3701-.3701-.393-.9637-.0443-1.3541C21.7795 6.4593 35.1114 0 49.9519 0 77.5927 0 100 22.4073 100 50.0481c0 14.8405-6.4593 28.1724-16.7199 37.3375-.3903.3487-.984.3258-1.3542-.0443L12.6587 18.074Z',
     })
+  );
+}
+
+/**
+ * Render priority icons like Linear uses.
+ * @param {number} priority
+ */
+function PriorityIcon(priority) {
+  const threeBarIcon = [
+    s('rect', { x: '1', y: '8', width: '3', height: '6', rx: '1' }),
+    s('rect', { x: '6', y: '5', width: '3', height: '9', rx: '1' }),
+    s('rect', { x: '11', y: '2', width: '3', height: '12', rx: '1' }),
+  ];
+  const priorityIcons = [
+    /** No priority */
+    [
+      // prettier-ignore
+      s('rect', { x: '1', y: '7.25', width: '3', height: '1.5', rx: '0.5', opacity: '0.9' }),
+      // prettier-ignore
+      s('rect', { x: '6', y: '7.25', width: '3', height: '1.5', rx: '0.5', opacity: '0.9' }),
+      // prettier-ignore
+      s('rect', { x: '11', y: '7.25', width: '3', height: '1.5', rx: '0.5', opacity: '0.9' }),
+    ],
+    /** Urgent */
+    [
+      // prettier-ignore
+      s('path', { d: 'M3 1.346a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2H3Zm3.914 3h1.738L8.5 9.948H7.07l-.156-5.602Zm1.809 7.164a.95.95 0 0 1-.938.938.934.934 0 1 1 0-1.867c.5 0 .934.417.938.929Z' }),
+    ],
+    /** High */
+    threeBarIcon,
+    /** Medium */
+    threeBarIcon,
+    /** Low */
+    threeBarIcon,
+  ];
+  return h(
+    'span',
+    {
+      class: `gh2l-priority-indicator gh2l-priority-${priority}`,
+      'aria-hidden': 'true',
+    },
+    s(
+      'svg',
+      { width: '16', height: '16', viewBox: '0 0 16 16' },
+      ...(priorityIcons[priority] || [])
+    )
   );
 }
 
@@ -209,4 +441,9 @@ function cleanUrl() {
   rawUrl.hash = '';
   rawUrl.searchParams.forEach((_, key) => rawUrl.searchParams.delete(key));
   return rawUrl.href;
+}
+
+/** Check if we’re on a PR tab like commits, checks, or files changed. */
+function isPrSubView() {
+  return /\/pull\/\d+\/.+$/.test(location.pathname);
 }
