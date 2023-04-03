@@ -39,7 +39,8 @@ async function injectUI() {
   const typeLabel = type === 'pull' ? 'PR' : 'Issue';
   const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
 
-  const linearIssue = await fetchExistingIssue(cleanUrl(), identifier);
+  const issues = await fetchExistingIssues(cleanUrl(), identifier);
+  const linearIssue = issues?.[0];
 
   // Create a link to an existing issue or to create a new issue on Linear.
   const linkEl = h(
@@ -63,7 +64,7 @@ async function injectUI() {
   }
   // Inject the link into the page.
   headerMeta.append(linkEl);
-  injectIssueInfobox(linearIssue);
+  injectSidebarUI(issues);
 }
 
 /**
@@ -107,18 +108,28 @@ function hFactory(tag, attrs = {}) {
 }
 
 /**
- * @param {Awaited<ReturnType<typeof fetchExistingIssue>>} linearIssue
+ *
+ * @param {Awaited<ReturnType<typeof fetchExistingIssues>>} issues
  */
-function injectIssueInfobox(linearIssue) {
+function injectSidebarUI(issues) {
   /** ID for the infobox we’ll create. */
   const id = 'github-to-linear-issue-infobox';
-  if (!linearIssue || document.getElementById(id) || isPrSubView()) return;
+  if (!issues?.length || document.getElementById(id) || isPrSubView()) {
+    return;
+  }
   const sidebar = document.querySelector('.Layout-sidebar');
   if (!sidebar) {
     console.error('Could not find page sidebar.');
     return;
   }
 
+  sidebar.prepend(h('div', { id }, IssueInfobox(issues[0])));
+}
+
+/**
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]} linearIssue
+ */
+function IssueInfobox(linearIssue) {
   const { assignee, cycle, project } = linearIssue;
 
   const TableRow = hFactory('tr');
@@ -251,16 +262,14 @@ function injectIssueInfobox(linearIssue) {
         )
       : '';
 
-  const infobox = h(
+  return h(
     'div',
-    { class: 'gh2l-issue-infobox border f6 mb-2 p-2 rounded-2', id },
+    { class: 'gh2l-issue-infobox border f6 mb-2 p-2 rounded-2' },
     InfoboxHeading(linearIssue),
     h('table', {}, statusRow, priorityRow, assigneeRow),
     h('div', { class: 'border-top my-2' }),
     h('table', {}, cycleRow, projectRow, dueDateRow, labelsRow)
   );
-
-  sidebar.prepend(infobox);
 }
 
 /** Render the title of the issue infobox. */
@@ -378,7 +387,7 @@ async function getNewIssueUrl(title, description) {
  * - The issue has an attachment linking back to the current page.
  * @param {string} issueUrl URL for the current issue or PR
  * @param {string} identifier Short-form identifier in the form of `{org}/{repo}#{number}`
- * @returns {Promise<null | {
+ * @returns {Promise<null | Array<{
  *  url: string;
  *  identifier: string;
  *  state: { name: string; color: string; type: string }
@@ -390,9 +399,9 @@ async function getNewIssueUrl(title, description) {
  *  dueDate?: `${number}-${number}-${number}`
  *  labels: { nodes: { name: string; color: string }[] }
  *  team: { color?: string }
- * }>}
+ * }>>}
  */
-async function fetchExistingIssue(issueUrl, identifier) {
+async function fetchExistingIssues(issueUrl, identifier) {
   const response = await new Promise((resolve) => {
     // Use callback-style of sendMessage because Promise-style requires Manifest v3 in Chrome.
     chrome.runtime.sendMessage(
@@ -408,7 +417,6 @@ async function fetchExistingIssue(issueUrl, identifier) {
         { attachments: { url: { containsIgnoreCase: "${issueUrl}" } } }
       ]
     }
-    first: 1
   ) {
     nodes {
       url
@@ -432,7 +440,7 @@ async function fetchExistingIssue(issueUrl, identifier) {
       (response) => resolve(response)
     );
   });
-  return response?.data?.issueSearch?.nodes?.[0] || null;
+  return response?.data?.issueSearch?.nodes || null;
 }
 
 /** Get the current URL without any query params or fragment hashes. */
