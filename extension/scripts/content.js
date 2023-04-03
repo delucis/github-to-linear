@@ -147,7 +147,19 @@ async function getNewIssueUrl(title, description) {
  * - The issue has an attachment linking back to the current page.
  * @param {string} issueUrl URL for the current issue or PR
  * @param {string} identifier Short-form identifier in the form of `{org}/{repo}#{number}`
- * @returns {Promise<null | { url: string; identifier: string; state: { name: string } }>}
+ * @returns {Promise<null | {
+ *  url: string;
+ *  identifier: string;
+ *  state: { name: string; color: string; type: string }
+ *  priorityLabel: string;
+ *  priority: number;
+ *  assignee?: { avatarUrl?: string; displayName: string; isMe: boolean; url: string }
+ *  cycle?: { name?: string; startsAt: string; endsAt: string }
+ *  project?: { name: string; url: string }
+ *  dueDate?: `${number}-${number}-${number}`
+ *  labels: { nodes: { name: string; color: string }[] }
+ *  team: { color?: string }
+ * }>}
  */
 async function fetchExistingIssue(issueUrl, identifier) {
   const response = await new Promise((resolve) => {
@@ -170,7 +182,17 @@ async function fetchExistingIssue(issueUrl, identifier) {
     nodes {
       url
       identifier
-      state { name }
+      state { name color type }
+      priorityLabel
+      priority
+      assignee { avatarUrl displayName isMe url }
+      cycle { name startsAt endsAt }
+      project { name url }
+      dueDate
+      labels {
+        nodes { name color }
+      }
+      team { color }
     }
   }
 }`,
