@@ -42,7 +42,7 @@ async function injectUI() {
 
   const ButtonGroup = h(
     'div',
-    { id: linkId, class: 'BtnGroup flex-self-start ml-auto' },
+    { id: linkId, class: 'BtnGroup rounded-left-2 flex-self-start ml-auto' },
     // Main link to an existing issue or to create a new issue on Linear.
     h(
       'a',
