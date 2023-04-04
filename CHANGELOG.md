@@ -1,5 +1,15 @@
 # github-to-linear
 
+## 0.4.0
+
+### Minor Changes
+
+- [`31107e3`](https://github.com/delucis/github-to-linear/commit/31107e3408853cca1613ebb629e2e97dabebaaab) Thanks [@delucis](https://github.com/delucis)! - Support creating a new Linear issue even if there already is an issue for the current page. Shows a smaller “+” link next to the main button at the top of the page.
+
+- [#20](https://github.com/delucis/github-to-linear/pull/20) [`67e2621`](https://github.com/delucis/github-to-linear/commit/67e26211c82ce8e8d77f66c5a7c4bd62f67b0251) Thanks [@delucis](https://github.com/delucis)! - Show Linear tickets for linked issues in PRs.
+
+  Some PRs have “linked” issues that they close on GitHub. If a Linear ticket was made for a GitHub _issue_ it now also shows on the PR that closes that GitHub issue.
+
 ## 0.3.1
 
 ### Patch Changes
