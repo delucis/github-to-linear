@@ -15,12 +15,9 @@ async function injectUI() {
   if (document.getElementById(linkId)) return;
 
   // Parse the current URL to grab some information about the issue or PR.
-  const matches = /^\/([^\/]+)\/([^\/]+)\/(issues|pull)\/(\d+)/.exec(
-    location.pathname
-  );
+  const issueMetaData = parseGitHubUrl(location);
   // If we’re not in an issue or PR we can return early.
-  if (!matches) return;
-  const [_fullMatch, org, repo, type, number] = matches;
+  if (!issueMetaData) return;
 
   // The header section of an issue/PR we want to inject our link into.
   const headerMeta = document.querySelector('.gh-header-meta');
@@ -33,14 +30,14 @@ async function injectUI() {
   const titleEl = document.querySelector('.js-issue-title');
   const issueTitle = titleEl?.textContent;
 
-  const identifier = `${org}/${repo}#${number}`;
+  const identifier = makeGitHubIdentifier(issueMetaData);
   let title = identifier;
   if (issueTitle) title += ' — ' + issueTitle;
-  const typeLabel = type === 'pull' ? 'PR' : 'Issue';
+  const typeLabel = issueMetaData.type === 'pull' ? 'PR' : 'Issue';
   const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
   const newIssueUrl = await getNewIssueUrl(title, description);
 
-  const issues = await fetchExistingIssues(cleanUrl(), identifier);
+  const issues = await fetchExistingIssues({ url: cleanUrl(), identifier });
   const linearIssue = issues?.[0];
 
   const ButtonGroup = h(
@@ -459,8 +456,8 @@ async function getNewIssueUrl(title, description) {
  * - The issue title or description contains the current page URL.
  * - The issue title or description contains an `{org}/{repo}#{number}` string matching the current issue/PR.
  * - The issue has an attachment linking back to the current page.
- * @param {string} issueUrl URL for the current issue or PR
- * @param {string} identifier Short-form identifier in the form of `{org}/{repo}#{number}`
+ * - In PRs: any of the above for issues linked to the PR.
+ * @param {{ url: string; identifier: string }} currentIssue URL and identifier for the current page.
  * @returns {Promise<null | Array<{
  *  url: string;
  *  identifier: string;
@@ -476,7 +473,17 @@ async function getNewIssueUrl(title, description) {
  *  team: { color?: string }
  * }>>}
  */
-async function fetchExistingIssues(issueUrl, identifier) {
+async function fetchExistingIssues(currentIssue) {
+  const issues = [currentIssue, ...getLinkedIssues()];
+
+  /** Format a block of GraphQL filter predicates for a given GitHub issue.  */
+  const makeFilterBlock = ({ url, identifier }) =>
+    `{ description: { containsIgnoreCase: "${identifier}" } }
+      { description: { containsIgnoreCase: "${url}" }  }
+      { title: { containsIgnoreCase: "${identifier}" } }
+      { title: { containsIgnoreCase: "${url}" } }
+      { attachments: { url: { containsIgnoreCase: "${url}" } } }`;
+
   const response = await new Promise((resolve) => {
     // Use callback-style of sendMessage because Promise-style requires Manifest v3 in Chrome.
     chrome.runtime.sendMessage(
@@ -485,11 +492,7 @@ async function fetchExistingIssues(issueUrl, identifier) {
   issueSearch(
     filter: {
       or: [
-        { description: { containsIgnoreCase: "${identifier}" } }
-        { description: { containsIgnoreCase: "${issueUrl}" }  }
-        { title: { containsIgnoreCase: "${identifier}" } }
-        { title: { containsIgnoreCase: "${issueUrl}" } }
-        { attachments: { url: { containsIgnoreCase: "${issueUrl}" } } }
+        ${issues.map(makeFilterBlock).join('\n')}
       ]
     }
   ) {
@@ -530,4 +533,45 @@ function cleanUrl() {
 /** Check if we’re on a PR tab like commits, checks, or files changed. */
 function isPrSubView() {
   return /\/pull\/\d+\/.+$/.test(location.pathname);
+}
+
+/**
+ * Try to parse a GitHub issue or PR URL to get some context from it.
+ * @param {{ pathname: string }} url GitHub URL to parse
+ * @returns {null|{ org: string; repo: string; type: 'issues' | 'pull'; number: string }}
+ */
+function parseGitHubUrl({ pathname }) {
+  const matches = /^\/([^\/]+)\/([^\/]+)\/(issues|pull)\/(\d+)/.exec(pathname);
+  if (!matches) return null;
+  const [_fullMatch, org, repo, type, number] = matches;
+  return { org, repo, type: /** @type {'issues'|'pull'} */ (type), number };
+}
+
+/**
+ * Get a `{org}/{repo}#{number}` identifier for a GitHub issue or PR.
+ * @param {NonNullable<ReturnType<typeof parseGitHubUrl>>} metadata
+ */
+function makeGitHubIdentifier({ org, repo, number }) {
+  return `${org}/${repo}#${number}`;
+}
+
+/**
+ * Finds the “Development” section in the GitHub PR sidebar and extracts URLs
+ * for any GitHub issues linked to this PR.
+ */
+function getLinkedIssues() {
+  const linkEls =
+    document.querySelector('development-menu')?.querySelectorAll('a') || [];
+  return [...linkEls]
+    .map((a) => {
+      const metadata = parseGitHubUrl(a);
+      if (!metadata) return null;
+      return {
+        url: a.href,
+        identifier: makeGitHubIdentifier(metadata),
+      };
+    })
+    .filter(
+      /** @type {<T>(arg: T) => arg is NonNullable<T>} */ ((a) => Boolean(a))
+    );
 }
