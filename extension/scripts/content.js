@@ -15,12 +15,10 @@ async function injectUI() {
   if (document.getElementById(linkId)) return;
 
   // Parse the current URL to grab some information about the issue or PR.
-  const matches = /^\/([^\/]+)\/([^\/]+)\/(issues|pull)\/(\d+)/.exec(
-    location.pathname
-  );
+  const issueMetaData = parseGitHubUrl(location);
   // If we’re not in an issue or PR we can return early.
-  if (!matches) return;
-  const [_fullMatch, org, repo, type, number] = matches;
+  if (!issueMetaData) return;
+  const { org, repo, type, number } = issueMetaData;
 
   // The header section of an issue/PR we want to inject our link into.
   const headerMeta = document.querySelector('.gh-header-meta');
@@ -530,4 +528,16 @@ function cleanUrl() {
 /** Check if we’re on a PR tab like commits, checks, or files changed. */
 function isPrSubView() {
   return /\/pull\/\d+\/.+$/.test(location.pathname);
+}
+
+/**
+ * Try to parse a GitHub issue or PR URL to get some context from it.
+ * @param {{ pathname: string }} url GitHub URL to parse
+ * @returns {null|{ org: string; repo: string; type: 'issues' | 'pull'; number: string }}
+ */
+function parseGitHubUrl({ pathname }) {
+  const matches = /^\/([^\/]+)\/([^\/]+)\/(issues|pull)\/(\d+)/.exec(pathname);
+  if (!matches) return null;
+  const [_fullMatch, org, repo, type, number] = matches;
+  return { org, repo, type: /** @type {'issues'|'pull'} */ (type), number };
 }
