@@ -18,7 +18,6 @@ async function injectUI() {
   const issueMetaData = parseGitHubUrl(location);
   // If we’re not in an issue or PR we can return early.
   if (!issueMetaData) return;
-  const { org, repo, type, number } = issueMetaData;
 
   // The header section of an issue/PR we want to inject our link into.
   const headerMeta = document.querySelector('.gh-header-meta');
@@ -31,10 +30,10 @@ async function injectUI() {
   const titleEl = document.querySelector('.js-issue-title');
   const issueTitle = titleEl?.textContent;
 
-  const identifier = `${org}/${repo}#${number}`;
+  const identifier = makeGitHubIdentifier(issueMetaData);
   let title = identifier;
   if (issueTitle) title += ' — ' + issueTitle;
-  const typeLabel = type === 'pull' ? 'PR' : 'Issue';
+  const typeLabel = issueMetaData.type === 'pull' ? 'PR' : 'Issue';
   const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
   const newIssueUrl = await getNewIssueUrl(title, description);
 
@@ -540,4 +539,12 @@ function parseGitHubUrl({ pathname }) {
   if (!matches) return null;
   const [_fullMatch, org, repo, type, number] = matches;
   return { org, repo, type: /** @type {'issues'|'pull'} */ (type), number };
+}
+
+/**
+ * Get a `{org}/{repo}#{number}` identifier for a GitHub issue or PR.
+ * @param {NonNullable<ReturnType<typeof parseGitHubUrl>>} metadata
+ */
+function makeGitHubIdentifier({ org, repo, number }) {
+  return `${org}/${repo}#${number}`;
 }
