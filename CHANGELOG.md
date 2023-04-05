@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.4.2
+
+### Patch Changes
+
+- [`208e2fb`](https://github.com/delucis/github-to-linear/commit/208e2fb126e3aa946c483472d7c58fe01d687224) Thanks [@delucis](https://github.com/delucis)! - Actually fix button corner style clash with Refined GitHub.
+
 ## 0.4.1
 
 ### Patch Changes
