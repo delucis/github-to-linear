@@ -153,7 +153,7 @@ function injectSidebarUI(issues) {
                   style: 'vertical-align: middle;',
                 },
                 ...moreIssues.map((issue) => StatusIcon(issue.state)),
-                `${nMore} more issue${nMore > 1 ? s : ''}`
+                `${nMore} more issue${nMore > 1 ? 's' : ''}`
               )
             ),
             ...moreIssues.map(IssueInfobox)
