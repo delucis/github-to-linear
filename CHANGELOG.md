@@ -1,5 +1,13 @@
 # github-to-linear
 
+## 0.4.3
+
+### Patch Changes
+
+- [`9d89e9b`](https://github.com/delucis/github-to-linear/commit/9d89e9bc6f654f69c6c6c54d458d79991c1b70aa) Thanks [@delucis](https://github.com/delucis)! - Fix “more issues” plural logic.
+
+- [`b715efc`](https://github.com/delucis/github-to-linear/commit/b715efc22a54837c948aaf29c64077e28a245e1d) Thanks [@delucis](https://github.com/delucis)! - Add spacing between multiple issue labels.
+
 ## 0.4.2
 
 ### Patch Changes
