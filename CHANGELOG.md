@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.5.0
+
+### Minor Changes
+
+- [#25](https://github.com/delucis/github-to-linear/pull/25) [`b800f42`](https://github.com/delucis/github-to-linear/commit/b800f4253a9fbfea61b6a80691cce51165925e34) Thanks [@delucis](https://github.com/delucis)! - Show a copy button for Linear’s suggested branch name.
+
 ## 0.4.3
 
 ### Patch Changes
