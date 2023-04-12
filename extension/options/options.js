@@ -81,7 +81,7 @@ async function populatePreferencesForm() {
   wipePreferencesForm();
   const form = document.getElementById('preferences-form');
   form.append(assigneesMenu, teamsMenu);
-  restorePreferences();
+  await restorePreferences();
   // Uncollapse the preferences form now that it has been built.
   form.closest('details').open = true;
 }
@@ -136,15 +136,26 @@ function savePreferences() {
 /**
  * Update the preferences form to reflect user preferences in browser storage.
  */
-function restorePreferences() {
+async function restorePreferences() {
   /** @type {HTMLFormElement | null} */
   const form = document.getElementById('preferences-form');
   if (!form || form.elements.length === 0) return;
-  chrome.storage.local.get({ defaults: {} }, ({ defaults }) => {
-    ['team', 'assignee'].map((key) => {
-      if (defaults[key] && form[key]) {
-        form[key].value = defaults[key];
-      }
+  const defaults = await loadPreferences();
+  for (const key of ['team', 'assignee']) {
+    if (defaults[key] && form[key]) {
+      form[key].value = defaults[key];
+    }
+  }
+}
+
+/**
+ * Load user preferences from browser storage.
+ * @returns {Promise<{ team?: string; assignee?: string; status?: { issue?: string; pr?: string; draftPR?: string } }>}
+ */
+function loadPreferences() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ defaults: {} }, ({ defaults }) => {
+      resolve(defaults);
     });
   });
 }
