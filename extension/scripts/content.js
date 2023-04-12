@@ -282,11 +282,13 @@ function IssueInfobox(linearIssue) {
       ? TableRow(
           TableHeader('Labels'),
           TableCell(
-            ...linearIssue.labels.nodes.map((label) =>
+            ...linearIssue.labels.nodes.map((label, index, labels) =>
               h(
                 'span',
                 {
-                  class: 'gh2l-label Label Label--inline',
+                  class:
+                    'gh2l-label Label Label--inline' +
+                    (index < labels.length - 1 ? ' mr-1' : ''),
                   style: `--gh2l-label-color: ${label.color}`,
                 },
                 label.name
