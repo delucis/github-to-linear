@@ -308,11 +308,14 @@ function IssueInfobox(linearIssue) {
   );
 }
 
-/** Render the title of the issue infobox. */
+/**
+ * Render the title of the issue infobox.
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]} linearIssue
+ */
 function InfoboxHeading(linearIssue) {
   return h(
     'p',
-    {},
+    { class: 'd-flex gap-1 flex-justify-between' },
     h(
       'a',
       {
@@ -331,8 +334,39 @@ function InfoboxHeading(linearIssue) {
         ),
         h('span', { class: 'Truncate-text color-fg-muted' }, linearIssue.title)
       )
-    )
+    ),
+    BranchCopyButton(linearIssue)
   );
+}
+
+/**
+ * A button that copies Linear’s suggested branch name to the clipboard.
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]} linearIssue
+ */
+function BranchCopyButton({ branchName }) {
+  const copyLabel = 'Copy suggested branch name';
+  const branchButton = h(
+    'button',
+    {
+      class: 'btn-octicon mt-n1 mb-n1 mr-n1 ml-0',
+      type: 'button',
+      title: copyLabel,
+    },
+    BranchIcon()
+  );
+  let timeout;
+  branchButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(branchName).then(() => {
+      clearTimeout(timeout);
+      branchButton.title = 'Copied branch name!';
+      branchButton.classList.add('anim-fade-in');
+      timeout = setTimeout(() => {
+        branchButton.title = copyLabel;
+        branchButton.classList.remove('anim-fade-in');
+      }, 2000);
+    });
+  });
+  return branchButton;
 }
 
 /** Render the Linear Logo as an inline SVG. */
@@ -353,6 +387,22 @@ function LinearLogo(color = '#5E6AD2') {
 }
 
 function PlusIcon() {
+  return Octicon(
+    'M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z'
+  );
+}
+
+function BranchIcon() {
+  return Octicon(
+    'M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z'
+  );
+}
+
+/**
+ * Render a GitHub octicon path with the appropriate attributes.
+ * @param {string} d Path definition for the icon to render.
+ */
+function Octicon(d) {
   return s(
     'svg',
     {
@@ -362,9 +412,7 @@ function PlusIcon() {
       class: 'octicon',
       'aria-hidden': 'true',
     },
-    s('path', {
-      d: 'M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z',
-    })
+    s('path', { d })
   );
 }
 
@@ -464,6 +512,7 @@ async function getNewIssueUrl(title, description) {
  *  url: string;
  *  identifier: string;
  *  title: string;
+ *  branchName: string;
  *  state: { name: string; color: string; type: string }
  *  priorityLabel: string;
  *  priority: number;
@@ -502,6 +551,7 @@ async function fetchExistingIssues(currentIssue) {
       url
       identifier
       title
+      branchName
       state { name color type }
       priorityLabel
       priority
