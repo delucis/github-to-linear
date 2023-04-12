@@ -35,7 +35,11 @@ async function injectUI() {
   if (issueTitle) title += ' — ' + issueTitle;
   const typeLabel = issueMetaData.type === 'pull' ? 'PR' : 'Issue';
   const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
-  const newIssueUrl = await getNewIssueUrl(title, description);
+  const newIssueUrl = await getNewIssueUrl(
+    title,
+    description,
+    issueMetaData.type
+  );
 
   const issues = await fetchExistingIssues({ url: cleanUrl(), identifier });
   const linearIssue = issues?.[0];
@@ -430,9 +434,10 @@ function PriorityIcon(priority) {
  * Takes user preferences into account.
  * @param {string} title Title to pre-fill in the new issue
  * @param {string} description Description to pre-fill in the new issue
+ * @param {'issues' | 'pull'} type Type of page we’re on.
  * @returns {Promise<string>}
  */
-async function getNewIssueUrl(title, description) {
+async function getNewIssueUrl(title, description, type) {
   const createIssueUrl = new URL('https://linear.app/new');
   createIssueUrl.searchParams.set('title', title);
   createIssueUrl.searchParams.set('description', description);
@@ -448,6 +453,13 @@ async function getNewIssueUrl(title, description) {
   }
   if (defaults?.assignee) {
     createIssueUrl.searchParams.set('assignee', defaults.assignee);
+  }
+  if (defaults?.status) {
+    if (type === 'issues' && defaults.status.issue) {
+      createIssueUrl.searchParams.set('status', defaults.status.issue);
+    } else if (type === 'pull' && defaults.status.pr) {
+      createIssueUrl.searchParams.set('status', defaults.status.pr);
+    }
   }
   return createIssueUrl.href;
 }

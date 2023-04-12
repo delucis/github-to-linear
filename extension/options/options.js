@@ -22,6 +22,15 @@ document
 document
   .getElementById('preferences-form')
   .addEventListener('change', savePreferences);
+document
+  .getElementById('status-form')
+  .addEventListener('change', savePreferences);
+
+chrome.storage.onChanged.addListener(async ({ defaults }) => {
+  if (defaults.newValue.team !== defaults.oldValue.team) {
+    populateStatusPreferencesForm(undefined, defaults.newValue);
+  }
+});
 
 /**
  * Authenticate by trying to fetch the logged-in user from Linear.
@@ -82,8 +91,52 @@ async function populatePreferencesForm() {
   const form = document.getElementById('preferences-form');
   form.append(assigneesMenu, teamsMenu);
   await restorePreferences();
+  await populateStatusPreferencesForm(data);
   // Uncollapse the preferences form now that it has been built.
   form.closest('details').open = true;
+}
+
+/**
+ * @param {Awaited<ReturnType<typeof getWorkspaceInfo>>} [workspaceArg]
+ * @param {Awaited<ReturnType<typeof loadPreferences>>} [preferencesArg]
+ */
+async function populateStatusPreferencesForm(workspaceArg, preferencesArg) {
+  wipeStatusForm();
+  const preferences = preferencesArg || (await loadPreferences());
+  if (!preferences || !preferences.team) return;
+  const workspace = workspaceArg || (await getWorkspaceInfo());
+  if (!workspace) return;
+  const team = workspace.teams.nodes.find(
+    (team) => team.key === preferences.team
+  );
+  if (!team) return;
+  const types = ['backlog', 'unstarted', 'started', 'completed', 'canceled'];
+  const states = team.states.nodes
+    .sort((a, b) => {
+      const aTypeOrder = types.indexOf(a.type);
+      const bTypeOrder = types.indexOf(b.type);
+      if (a.type === b.type) {
+        return a.position > b.position ? 1 : a.position < b.position ? -1 : 0;
+      } else {
+        return aTypeOrder > bTypeOrder ? 1 : aTypeOrder < bTypeOrder ? -1 : 0;
+      }
+    })
+    .map((state) => state.name);
+  states.unshift('');
+  const statusPreferences = [
+    Dropdown('Default Status from issue', 'issue', states),
+    Dropdown('Default Status from draft PR', 'draftPR', states),
+    Dropdown('Default Status from PR', 'pr', states),
+  ];
+  const form = document.getElementById('status-form');
+  form.append(...statusPreferences);
+
+  if (preferences.status) {
+    for (const key of ['issue', 'pr', 'draftPR']) {
+      const preference = preferences.status[key];
+      if (preference && form[key]) form[key].value = preference;
+    }
+  }
 }
 
 /**
@@ -116,21 +169,41 @@ function Dropdown(labelText, id, options) {
  * Used when a user is no longer authenticated.
  */
 function wipePreferencesForm() {
+  wipeStatusForm();
   const form = document.getElementById('preferences-form');
   form.innerHTML = '';
   form.closest('details').open = false;
 }
 
 /**
+ * Delete all the form elements in the status preferences form.
+ * Used when a user is no longer authenticated.
+ */
+function wipeStatusForm() {
+  const form = document.getElementById('status-form');
+  form.innerHTML = '';
+}
+
+/**
  * Store the current state of the preferences form in browser storage.
  */
-function savePreferences() {
+async function savePreferences() {
   /** @type {HTMLFormElement | null} */
   const form = document.getElementById('preferences-form');
-  if (!form || form.elements.length === 0) return;
-  const assignee = form.assignee.value;
-  const team = form.team.value;
-  chrome.storage.local.set({ defaults: { team, assignee } });
+  /** @type {HTMLFormElement | null} */
+  const statuses = document.getElementById('status-form');
+  /** @type {Awaited<ReturnType<typeof loadPreferences>>} */
+  const defaults = { status: {} };
+  if (form && form.elements.length > 0) {
+    defaults.assignee = form.assignee.value;
+    defaults.team = form.team.value;
+  }
+  if (statuses && statuses.elements.length > 0) {
+    defaults.status.issue = statuses.issue.value;
+    defaults.status.pr = statuses.pr.value;
+    defaults.status.draftPR = statuses.draftPR.value;
+  }
+  chrome.storage.local.set({ defaults });
 }
 
 /**
@@ -174,11 +247,14 @@ async function getCurrentUser() {
 
 /**
  * Get information about the teams and users available in this workspace.
- * @returns {Promise<null | { teams: { nodes: { key: string }[] }; users: { nodes: { displayName: string }[] } }>}
+ * @returns {Promise<null | { teams: { nodes: { key: string; states: { nodes: { position: number; name: string; type: string }[] } }[] }; users: { nodes: { displayName: string }[] } }>}
  */
 async function getWorkspaceInfo() {
   const workspace = await queryLinearApi(`{
-  teams { nodes { key } }
+  teams { nodes {
+    key
+    states { nodes { position name type } }
+  } }
   users { nodes { displayName } }
 }`);
   return workspace?.data || null;
