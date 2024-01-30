@@ -1,5 +1,17 @@
 # github-to-linear
 
+## 0.6.0
+
+### Minor Changes
+
+- [`b5a3a62`](https://github.com/delucis/github-to-linear/commit/b5a3a629420a2dc4c75a8bff32618792327d991b) Thanks [@delucis](https://github.com/delucis)! - Improves status icons to more closely match Linear’s designs
+
+- [`c57cd51`](https://github.com/delucis/github-to-linear/commit/c57cd51a3966d8663d779017b0b8fbff16e6ead0) Thanks [@delucis](https://github.com/delucis)! - Linear issue links now also display inline in issue & PR list views, making it easier to spot items that have associated Linear issues
+
+### Patch Changes
+
+- [`d013396`](https://github.com/delucis/github-to-linear/commit/d0133968d5c872b98d1d02813c1d4c1c94a10dda) Thanks [@delucis](https://github.com/delucis)! - Includes archived Linear issues when searching for matches
+
 ## 0.5.0
 
 ### Minor Changes
