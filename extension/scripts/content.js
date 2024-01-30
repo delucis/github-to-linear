@@ -27,7 +27,7 @@ async function injectIssueListUI() {
       if (!issues?.length) return;
       // Sort issues to show incomplete issues first.
       issues.sort((a, b) => {
-        const states = { backlog: 0, unstarted: 1, started: 2, completed: 3 };
+        const states = { backlog: 0, unstarted: 1, started: 2, completed: 3, canceled: 4 };
         return states[a.state.type] - states[b.state.type];
       });
       const issueLinks = issues.map(InlineIssueLink);
@@ -471,13 +471,31 @@ function Octicon(d) {
 
 /**
  * Render an issue status icon, similar to Linear’s style.
- * @param {{ type: string; color: string }} state
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]['state']} state
  */
 function StatusIcon({ type, color }) {
-  return h('span', {
-    class: `gh2l-status-indicator gh2l-status-${type}`,
-    style: `--gh2l-status-color:${color};`,
-  });
+  const paths = {
+    backlog:
+      'M6.2 0a7 7 0 0 1 1.6 0l-.2 2a5 5 0 0 0-1.2 0l-.2-2Zm3.6.6a7 7 0 0 1 1.4.8L10 3a5 5 0 0 0-1-.6L9.8.6Zm-7 .8A7 7 0 0 1 4.2.6L5 2.4A5 5 0 0 0 4 3L2.8 1.4Zm9.8 1.4.8 1.4-1.8.8a5 5 0 0 0-.6-1l1.6-1.2ZM.6 4.2a7 7 0 0 1 .8-1.4L3 4a5 5 0 0 0-.6 1L.6 4.2Zm13.3 2a7 7 0 0 1 0 1.6l-2-.2a5 5 0 0 0 0-1.2l2-.2ZM0 7v-.8l2 .2a5 5 0 0 0 0 1.2l-2 .2A7 7 0 0 1 0 7Zm13.4 2.8a7 7 0 0 1-.8 1.4L11 10a5 5 0 0 0 .6-1l1.8.8Zm-12 1.4a7 7 0 0 1-.8-1.4L2.4 9a5 5 0 0 0 .6 1l-1.6 1.2Zm9.8 1.4a7 7 0 0 1-1.4.8L9 11.6a5 5 0 0 0 1-.6l1.2 1.6Zm-7 .8-1.4-.8L4 11a5 5 0 0 0 1 .6l-.8 1.8ZM7 14a7 7 0 0 1-.8 0l.2-2a5 5 0 0 0 1.2 0l.2 2a7 7 0 0 1-.8 0Z',
+    unstarted: 'M7 2a5 5 0 1 0 0 10A5 5 0 0 0 7 2ZM0 7a7 7 0 1 1 14 0A7 7 0 0 1 0 7Z',
+    started:
+      'M2 7a5 5 0 1 1 10 0A5 5 0 0 1 2 7Zm5-7a7 7 0 1 0 0 14A7 7 0 0 0 7 0Zm4 7a4 4 0 0 1-4 4V3a4 4 0 0 1 4 4Z',
+    completed:
+      'M0 7a7 7 0 1 1 14 0A7 7 0 0 1 0 7Zm10.95-1.55a.85.85 0 1 0-1.2-1.2l-4.4 4.4-1.4-1.4a.85.85 0 1 0-1.2 1.2l2 2c.33.33.87.33 1.2 0l5-5Z',
+    canceled:
+      'M0 7a7 7 0 1 1 14 0A7 7 0 0 1 0 7Zm4.75-3a.75.75 0 0 0-.53 1.28l1.97 1.97-.99.98-.98.99a.75.75 0 1 0 1.06 1.06l1.97-1.97 1.97 1.97a.75.75 0 1 0 1.06-1.06L8.31 7.25l1.97-1.97a.75.75 0 0 0-.82-1.23.75.75 0 0 0-.24.17L7.25 6.19l-.98-.99-.99-.98A.75.75 0 0 0 4.75 4Z',
+  };
+  return s(
+    'svg',
+    {
+      viewBox: '0 0 14 14',
+      width: '14',
+      height: '14',
+      'aria-hidden': 'true',
+      fill: color,
+    },
+    s('path', { d: paths[type] })
+  );
 }
 
 /**
@@ -566,7 +584,7 @@ async function getNewIssueUrl(title, description) {
  *  identifier: string;
  *  title: string;
  *  branchName: string;
- *  state: { name: string; color: string; type: 'backlog' | 'unstarted' | 'started' | 'completed' }
+ *  state: { name: string; color: string; type: 'backlog' | 'unstarted' | 'started' | 'completed' | 'canceled' }
  *  priorityLabel: string;
  *  priority: number;
  *  assignee?: { avatarUrl?: string; displayName: string; isMe: boolean; url: string }

@@ -22,47 +22,6 @@
   justify-self: center;
 }
 
-/* Issue card status row. */
-.gh2l-status-indicator {
-  --gh2l-status-indicator-size: 0.875rem;
-  --gh2l-status-fill-size: 0%;
-  --gh2l-status-border-style: solid;
-  --gh2l-status-border-width: 0.125rem;
-  position: relative;
-  display: inline-block;
-  width: var(--gh2l-status-indicator-size);
-  height: var(--gh2l-status-indicator-size);
-}
-.gh2l-status-indicator::before {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  inset: 0;
-  border: var(--gh2l-status-border-width) var(--gh2l-status-border-style)
-    var(--gh2l-status-color);
-}
-.gh2l-status-indicator::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  inset: calc(50% - 0.5 * var(--gh2l-status-fill-size));
-  background-color: var(--gh2l-status-color);
-}
-.gh2l-status-backlog {
-  --gh2l-status-border-style: dashed;
-  --gh2l-status-border-width: 1.5px;
-}
-.gh2l-status-unstarted {
-  --gh2l-status-fill-size: 0;
-}
-.gh2l-status-started {
-  --gh2l-status-fill-size: calc(6 / 14 * var(--gh2l-status-indicator-size));
-}
-.gh2l-status-completed,
-.gh2l-status-canceled {
-  --gh2l-status-fill-size: var(--gh2l-status-indicator-size);
-}
-
 /* Issue card priority row. */
 /* 0 = no priority; 1 = urgent; 2 = high; 3 = medium; 4 = low */
 .gh2l-priority-indicator {
