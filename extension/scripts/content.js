@@ -1,14 +1,67 @@
 // Run on page load.
-injectUI();
+init();
 // Run on each client-side navigation.
-document.addEventListener('turbo:render', injectUI);
+document.addEventListener('turbo:render', init);
+
+function init() {
+  injectSingleIssueUI();
+  injectIssueListUI();
+}
+
+/**
+ * Inject links to Linear issues on a GitHub list view of issues or PRs.
+ */
+async function injectIssueListUI() {
+  const containerClass = 'gh2l-list-links';
+  const issueRows = document.querySelectorAll('.js-issue-row');
+  for (const row of issueRows) {
+    if (row.querySelector('.' + containerClass)) continue;
+    const link = row.querySelector('a');
+    /** @type {HTMLSpanElement | null} */
+    const slot = row.querySelector('.opened-by + span');
+    if (!link || !slot) continue;
+    const issueMetaData = parseGitHubUrl(link);
+    if (!issueMetaData) continue;
+    const identifier = makeGitHubIdentifier(issueMetaData);
+    fetchExistingIssues({ url: link.href, identifier }).then((issues) => {
+      if (!issues?.length) return;
+      // Sort issues to show incomplete issues first.
+      issues.sort((a, b) => {
+        const states = { backlog: 0, unstarted: 1, started: 2, completed: 3 };
+        return states[a.state.type] - states[b.state.type];
+      });
+      const issueLinks = issues.map(InlineIssueLink);
+      slot.insertAdjacentElement(
+        'afterend',
+        h('span', { class: `${containerClass} d-none d-md-inline-flex gap-2 ml-2` }, ...issueLinks)
+      );
+    });
+  }
+}
+
+/**
+ * Render a link to a Linear issue suitable for displaying inline in issue/pull request lists.
+ * @param {NonNullable<Awaited<ReturnType<typeof fetchExistingIssues>>>[number]} linearIssue
+ */
+function InlineIssueLink(linearIssue) {
+  return h(
+    'a',
+    {
+      href: linearIssue.url,
+      class: 'Link--muted d-inline-flex gap-1 flex-items-center tooltipped tooltipped-s',
+      'aria-label': linearIssue.title,
+    },
+    StatusIcon(linearIssue.state),
+    h('span', {}, linearIssue.identifier)
+  );
+}
 
 /**
  * Only runs on issue & PR pages.
  * If a matching Linear issue is found, injects a link to the issue on Linear.
  * Otherwise, injects a link to create a new Linear issue linking to this page.
  */
-async function injectUI() {
+async function injectSingleIssueUI() {
   /** ID for the link we’ll create. */
   const linkId = 'github-to-linear-create-issue-link';
   // We already created our link. Let’s chill.
@@ -513,7 +566,7 @@ async function getNewIssueUrl(title, description) {
  *  identifier: string;
  *  title: string;
  *  branchName: string;
- *  state: { name: string; color: string; type: string }
+ *  state: { name: string; color: string; type: 'backlog' | 'unstarted' | 'started' | 'completed' }
  *  priorityLabel: string;
  *  priority: number;
  *  assignee?: { avatarUrl?: string; displayName: string; isMe: boolean; url: string }
