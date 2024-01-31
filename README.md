@@ -23,9 +23,22 @@ You can enable more functionality by authenticating with the Linear API.
 
 Currently, authenticating enables the following features:
 
-- Set the default team and assignee to use when creating a new Linear issue.
-- Show a link to an existing Linear issue instead of the “Add to Linear” button when one exists.
-- Show a detailed card for an existing Linear issue in the sidebar of GitHub issues and PRs.
+<table>
+	<tr>
+		<th width="50%">
+			<p><a title="details-card"></a> Show linked Linear issues in GitHub issues & PRs
+			<p><img src="https://github.com/delucis/github-to-linear/assets/357379/910c6b53-09c3-4b90-bb68-918ef212a295">
+		<th width="50%">
+			<p><a title="list-display"></a> Show linked Linear issues in GitHub issue & PR lists
+			<p><img src="https://github.com/delucis/github-to-linear/assets/357379/a6b94479-c501-40ae-9012-789fdee7979b">
+	<tr>
+		<th width="50%">
+			<p><a title="new-issue-defaults"></a> Set the default team and assignee to use when creating a new Linear issue
+			<p><img src="https://github.com/delucis/github-to-linear/assets/357379/1d85494d-cedf-4ead-9d05-1b00f9fe5e62">
+		<th width="50%">
+			<p><a title="quick-link"></a> Show a link to an existing Linear issue instead of the “Add to Linear” button when one exists.
+			<p><img src="https://github.com/delucis/github-to-linear/assets/357379/45a9bf49-3399-404b-b6ad-42d87ac6cecb">
+</table>
 
 #### How to authenticate with Linear
 
