@@ -617,7 +617,8 @@ async function fetchExistingIssues(currentIssue) {
         ${issues.map(makeFilterBlock).join('\n')}
       ]
     },
-    includeArchived: true
+    includeArchived: true,
+    first: 5
   ) {
     nodes {
       url
