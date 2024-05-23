@@ -1,5 +1,11 @@
 # github-to-linear
 
+## 0.6.1
+
+### Patch Changes
+
+- [`eedf6ea`](https://github.com/delucis/github-to-linear/commit/eedf6eaa73c8e399cf3cb7f0aef3fa57c6427ee3) Thanks [@delucis](https://github.com/delucis)! - Mitigate broken Linear issue search API by limiting number of issues to 5 to aovid overloading the GitHub UI
+
 ## 0.6.0
 
 ### Minor Changes
