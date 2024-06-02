@@ -664,7 +664,7 @@ function cleanUrl(number) {
     component = urlComponents.pop()
   }
 
-  return urlComponents.reduce((acc, curr) => acc + '/' + curr) + '/' + number
+  return urlComponents.join('/') + '/' + number;
 }
 
 /** Check if we’re on a PR tab like commits, checks, or files changed. */
