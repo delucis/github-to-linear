@@ -8,6 +8,9 @@ function loadLinearApiKey() {
   });
 }
 
+/** @type {Map<string, { data: any; t: number}>} */
+const queryCache = new Map();
+
 /**
  * Post a GraphQL query to the Linear API and get the parsed data back.
  * @param {string} query GraphQL query
@@ -16,6 +19,8 @@ function loadLinearApiKey() {
 async function queryLinearApi(query) {
   const apiKey = await loadLinearApiKey();
   if (!apiKey) return null;
+  const cached = queryCache.get(query);
+  if (cached && Date.now() - cached.t < 30_000) return cached.data;
   const response = await fetch('https://api.linear.app/graphql', {
     method: 'POST',
     headers: {
@@ -24,7 +29,9 @@ async function queryLinearApi(query) {
     },
     body: JSON.stringify({ query }),
   });
-  return await response.json();
+  const data = await response.json();
+  queryCache.set(query, { data, t: Date.now() });
+  return data;
 }
 
 // Handle messages from other parts of the extension.
