@@ -648,7 +648,10 @@ async function fetchExistingIssues(currentIssue) {
   return response?.data?.issueSearch?.nodes || null;
 }
 
-/** Get the current base PR/Issue URL without any query params or fragment hashes. */
+/**
+ * Get the current base PR/Issue URL without any query params or fragment hashes.
+ * @param {string} number The current PR/issue number.
+ */
 function cleanUrl(number) {
   const rawUrl = new URL(window.location.href);
   rawUrl.hash = '';
