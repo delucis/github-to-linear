@@ -1,5 +1,13 @@
 # github-to-linear
 
+## 0.7.0
+
+### Minor Changes
+
+- [`8cb7d45`](https://github.com/delucis/github-to-linear/commit/8cb7d453fbc81d1a23c7c955eda970957bb38eec) Thanks [@delucis](https://github.com/delucis)! - Cache Linear API requests for 30 seconds to improve performance when rapidly moving between views
+
+- [#34](https://github.com/delucis/github-to-linear/pull/34) [`f2fac12`](https://github.com/delucis/github-to-linear/commit/f2fac129c85358739f15b00c2f703af2b212d152) Thanks [@AbundantSalmon](https://github.com/AbundantSalmon)! - Show Linear link on PR Commits, Checks, and Files changed tabs as well as Conversations
+
 ## 0.6.1
 
 ### Patch Changes
