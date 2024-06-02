@@ -660,7 +660,7 @@ function cleanUrl(number) {
   const urlComponents = url.split('/')
 
   let component = urlComponents.pop()
-  while(component !== number) {
+  while(component && component !== number) {
     component = urlComponents.pop()
   }
 
