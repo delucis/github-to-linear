@@ -2,4 +2,4 @@
 "github-to-linear": minor
 ---
 
-Show linear link on PR Commits/Check/File changed as well as Conversations
+Show Linear link on PR Commits, Checks, and Files changed tabs as well as Conversations
