@@ -87,10 +87,11 @@ async function injectSingleIssueUI() {
   let title = identifier;
   if (issueTitle) title += ' — ' + issueTitle;
   const typeLabel = issueMetaData.type === 'pull' ? 'PR' : 'Issue';
-  const description = `GitHub ${typeLabel}: ${cleanUrl()}`;
+  const cleanedUrl = cleanUrl(issueMetaData.number)
+  const description = `GitHub ${typeLabel}: ${cleanedUrl}`;
   const newIssueUrl = await getNewIssueUrl(title, description);
 
-  const issues = await fetchExistingIssues({ url: cleanUrl(), identifier });
+  const issues = await fetchExistingIssues({ url: cleanedUrl, identifier });
   const linearIssue = issues?.[0];
 
   const ButtonGroup = h(
@@ -647,12 +648,23 @@ async function fetchExistingIssues(currentIssue) {
   return response?.data?.issueSearch?.nodes || null;
 }
 
-/** Get the current URL without any query params or fragment hashes. */
-function cleanUrl() {
+/**
+ * Get the current base PR/Issue URL without any query params or fragment hashes.
+ * @param {string} number The current PR/issue number.
+ */
+function cleanUrl(number) {
   const rawUrl = new URL(window.location.href);
   rawUrl.hash = '';
   rawUrl.searchParams.forEach((_, key) => rawUrl.searchParams.delete(key));
-  return rawUrl.href;
+  const url = rawUrl.href;
+  const urlComponents = url.split('/')
+
+  let component = urlComponents.pop()
+  while(component && component !== number) {
+    component = urlComponents.pop()
+  }
+
+  return urlComponents.join('/') + '/' + number;
 }
 
 /** Check if we’re on a PR tab like commits, checks, or files changed. */
