@@ -32,7 +32,7 @@ You can configure the extension options and browse GitHub as usual to test out i
 
 ## Release notes
 
-Releases are handled automatically by [Changesets]().
+Releases are handled automatically by [Changesets](https://github.com/changesets/changesets/).
 
 To add release notes for changes you made, run the following command in your terminal:
 
